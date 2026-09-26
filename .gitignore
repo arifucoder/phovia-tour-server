@@ -1,0 +1,64 @@
+# ===== Dependencies =====
+node_modules/
+.npm/
+npm-debug.log*
+
+# ===== Other lockfiles =====
+yarn.lock
+pnpm-lock.yaml
+bun.lock
+bun.lockb
+
+# ===== Environment variables =====
+.env
+.env.*
+!.env.example
+
+# ===== Next.js =====
+.next/
+out/
+next-env.d.ts
+.vercel
+
+# ===== Build output =====
+dist/
+build/
+*.tsbuildinfo
+
+# ===== Logs =====
+logs/
+*.log
+
+# ===== Testing / Coverage =====
+coverage/
+.nyc_output/
+
+# ===== MongoDB =====
+data/db/
+dump/
+*.bson
+
+# ===== Uploads =====
+uploads/
+public/uploads/
+
+# ===== Cache =====
+.cache/
+.eslintcache
+.turbo/
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Editor / IDE =====
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# ===== Misc =====
+*.pem
