@@ -2,23 +2,28 @@
 	"name": "phovia-tour-server",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
+	"main": "dist/server.js",
 	"scripts": {
-		"dev": "tsx watch src/index.ts",
+		"dev": "tsx watch src/server.ts",
 		"build": "tsc",
-		"start": "node dist/index.js"
+		"start": "node dist/server.js",
+		"lint": "npx eslint ./src"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"type": "commonjs",
+	"type": "module",
 	"devDependencies": {
+		"@eslint/js": "^10.0.1",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/node": "^26.6.3",
+		"eslint": "^10.11.0",
+		"tsup": "^8.5.1",
 		"tsx": "^4.23.15",
-		"typescript": "^7.0.2"
+		"typescript": "~6.0.0",
+		"typescript-eslint": "^8.70.1"
 	},
 	"dependencies": {
 		"cors": "^2.8.6",
