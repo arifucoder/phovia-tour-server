@@ -3,9 +3,8 @@ import express from "express";
 const app = express();
 
 app.get("/", (req: Request, res: Response) => {
-	res.status(201).json({
-		message: "Phovia!",
-		do: "do something crazy",
+	res.status(200).json({
+		message: "Welcome to Tour Management System Backend",
 	});
 });
 
