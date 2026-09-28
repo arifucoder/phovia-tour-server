@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import httpStatus from "http-status";
+import httpStatus from "http-status-codes";
 import { UserServices } from "./user.service";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -14,6 +14,15 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 		console.log(err);
 
 		next(err);
+	}
+};
+
+const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+	try{
+
+	}
+	catch(){
+
 	}
 };
 
