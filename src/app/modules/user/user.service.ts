@@ -1,12 +1,20 @@
+import httpStatus from "http-status-codes";
+import AppError from "../../errorHelpers/AppError";
 import { type IUser } from "./user.interface";
 import { User } from "./user.model";
 
 const createUser = async (payload: Partial<IUser>) => {
-	const { name, email } = payload;
+	const { email, ...rest } = payload;
+
+	const isUserExist = await User.find({ email });
+
+	if (isUserExist) {
+		throw new AppError(httpStatus.BAD_REQUEST, "User already exist");
+	}
 
 	const user = await User.create({
-		name,
 		email,
+		...rest,
 	});
 
 	return user;
