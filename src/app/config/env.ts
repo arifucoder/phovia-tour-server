@@ -6,10 +6,12 @@ interface EnvConfig {
 	PORT: string;
 	DB_URL: string;
 	NODE_ENV: "development" | "production";
+	JWT_ACCESS_SECRET: string;
+	JWT_ACCESS_EXPIRES: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
-	const requiredEnvVariables: string[] = ["PORT", "DB_URL", "NODE_ENV"];
+	const requiredEnvVariables: string[] = ["PORT", "DB_URL", "NODE_ENV", "JWT_ACCESS_SECRET", "JWT_ACCESS_EXPIRES"];
 
 	requiredEnvVariables.forEach((key) => {
 		if (!process.env[key]) {
@@ -22,6 +24,8 @@ const loadEnvVariables = (): EnvConfig => {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		DB_URL: process.env.DB_URL!, // ! (bang sign diye o kora jai) like string diye kortesi
 		NODE_ENV: process.env.NODE_ENV as "development" | "production",
+		JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
+		JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES as string,
 	};
 };
 
