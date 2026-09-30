@@ -1,4 +1,4 @@
-import { default as bcryptjs } from "bcryptjs";
+import bcrypt, { default as bcryptjs } from "bcryptjs";
 import httpStatus from "http-status-codes";
 import type { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
