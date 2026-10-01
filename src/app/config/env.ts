@@ -13,6 +13,8 @@ interface EnvConfig {
 	SUPER_ADMIN_EMAIL: string;
 	SUPER_ADMIN_PASSWORD: string;
 	BCRYPT_SALT_ROUND: string;
+	GOOGLE_CLIENT_ID: string;
+	GOOGLE_CLIENT_SECRET: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -27,6 +29,8 @@ const loadEnvVariables = (): EnvConfig => {
 		"SUPER_ADMIN_EMAIL",
 		"SUPER_ADMIN_PASSWORD",
 		"BCRYPT_SALT_ROUND",
+		"GOOGLE_CLIENT_ID",
+		"GOOGLE_CLIENT_SECRET",
 	];
 
 	requiredEnvVariables.forEach((key) => {
@@ -47,6 +51,8 @@ const loadEnvVariables = (): EnvConfig => {
 		SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
 		SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
 		BCRYPT_SALT_ROUND: process.env.BCRYPT_SALT_ROUND as string,
+		GOOGLE_CLIENT_ID: process.env.BCRYPT_SALT_ROUND as string,
+		GOOGLE_CLIENT_SECRET: process.env.BCRYPT_SALT_ROUND as string,
 	};
 };
 
