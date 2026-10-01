@@ -1,5 +1,7 @@
 import bcryptjs from "bcryptjs";
 import httpStatus from "http-status-codes";
+import type { JwtPayload } from "jsonwebtoken";
+import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { createNewAccessTokenWithRefreshToken, createUserTokens } from "../../utils/userTokens";
 import type { IUser } from "../user/user.interface";
@@ -50,7 +52,28 @@ const getNewAccessToken = async (refreshToken: string) => {
 	};
 };
 
+const changePassword = async (oldPassword: string, newPassword: string, decodedToken: JwtPayload) => {
+	const user = await User.findById(decodedToken.userId);
+
+	if (!user) {
+		throw new AppError(httpStatus.NOT_FOUND, "User not found");
+	}
+
+	// ১. পুরোনো password মিলছে কিনা
+	const isOldPasswordMatch = await bcryptjs.compare(oldPassword, user.password as string);
+
+	if (!isOldPasswordMatch) {
+		throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match");
+	}
+
+	// ২. নতুন password hash করে save করা
+	user.password = await bcryptjs.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND));
+
+	await user.save();
+};
+
 export const AuthServices = {
 	credentialLogin,
 	getNewAccessToken,
+	changePassword,
 };
