@@ -8,44 +8,45 @@ const divisionSchema = new Schema<IDivision>(
 		thumbnail: { type: String },
 		description: { type: String },
 	},
-	{
-		timestamps: true,
-	},
+	{ timestamps: true },
 );
 
-divisionSchema.pre("save", async function (next) {
-	if (this.isModified("name")) {
-		const baseSlug = this.name.toLowerCase().split(" ").join("-");
-		let slug = `${baseSlug}-division`;
+const generateUniqueSlug = async (name: string, excludeId?: unknown) => {
+	const baseSlug = `${name.trim().toLowerCase().split(/\s+/).join("-")}-division`;
+	let slug = baseSlug;
+	let counter = 1;
 
-		let counter = 0;
-		while (await Division.exists({ slug })) {
-			slug = `${slug}-${counter++}`; // dhaka-division-2
-		}
-
-		this.slug = slug;
+	while (
+		await Division.exists({
+			slug,
+			...(excludeId ? { _id: { $ne: excludeId } } : {}),
+		})
+	) {
+		slug = `${baseSlug}-${counter++}`; // dhaka-division-1, dhaka-division-2
 	}
-	next();
+
+	return slug;
+};
+
+divisionSchema.pre("save", async function () {
+	if (this.isModified("name")) {
+		this.slug = await generateUniqueSlug(this.name, this._id);
+	}
 });
 
-divisionSchema.pre("findOneAndUpdate", async function (next) {
-	const division = this.getUpdate() as Partial<IDivision>;
+divisionSchema.pre("findOneAndUpdate", async function () {
+	const update = this.getUpdate() as Record<string, any>;
+	const name = update?.name ?? update?.$set?.name;
 
-	if (division.name) {
-		const baseSlug = division.name.toLowerCase().split(" ").join("-");
-		let slug = `${baseSlug}-division`;
+	if (name) {
+		const existing = await this.model.findOne(this.getQuery()).select("_id");
+		const slug = await generateUniqueSlug(name, existing?._id);
 
-		let counter = 0;
-		while (await Division.exists({ slug })) {
-			slug = `${slug}-${counter++}`; // dhaka-division-2
-		}
+		if (update.$set) update.$set.slug = slug;
+		else update.slug = slug;
 
-		division.slug = slug;
+		this.setUpdate(update);
 	}
-
-	this.setUpdate(division);
-
-	next();
 });
 
 export const Division = model<IDivision>("Division", divisionSchema);

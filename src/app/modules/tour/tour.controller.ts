@@ -56,8 +56,7 @@ const getAllTourTypes = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createTourType = catchAsync(async (req: Request, res: Response) => {
-	const { name } = req.body;
-	const result = await TourService.createTourType(name);
+	const result = await TourService.createTourType(req.body);
 	sendResponse(res, {
 		statusCode: 201,
 		success: true,
