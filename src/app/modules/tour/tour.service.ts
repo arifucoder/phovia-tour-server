@@ -1,4 +1,5 @@
 import { QueryBuilder } from "../../utils/QueryBuilder";
+import { QueryBuilderProvia } from "../../utils/QueryBuilderProvia";
 import { tourSearchableFields } from "./tour.constant";
 import type { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
@@ -25,71 +26,71 @@ const createTour = async (payload: ITour) => {
 };
 
 // const getAllToursOld = async (query: Record<string, string>) => {
-//     console.log(query);
-//     const filter = query
-//     const searchTerm = query.searchTerm || "";
-//     const sort = query.sort || "-createdAt";
-//     const page = Number(query.page) || 1
-//     const limit = Number(query.limit) || 10
-//     const skip = (page - 1) * limit
+// 	console.log(query);
+// 	const filter = query;
+// 	const searchTerm = query.searchTerm || "";
+// 	const sort = query.sort || "-createdAt";
+// 	const fields = query.fields?.split(",").join(" ") || "";
+// 	const page = Number(query.page) || 1;
+// 	const limit = Number(query.limit) || 10;
+// 	const skip = (page - 1) * limit;
 
-//     //field fitlering
-//     const fields = query.fields?.split(",").join(" ") || ""
+// 	// delete filter["searchTerm"];
+// 	// delete filter["sort"];
 
-//     //old field => title,location
-//     //new fields => title location
+// 	const excludeField = ["searchTerm", "sort", "fields", "page", "limit"];
+// 	for (const field of excludeField) {
+// 		delete filter[field];
+// 	}
 
-//     // delete filter["searchTerm"]
-//     // delete filter["sort"]
+// 	// const tourSearchableFields = ["title", "description", "location"];
 
-//     for (const field of excludeField) {
-//         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-//         delete filter[field]
-//     }
+// 	const searchQuery = {
+// 		$or: tourSearchableFields.map((field) => ({ [field]: { $regex: searchTerm, $options: "i" } })),
+// 	};
 
-//     console.log(filter);
+// 	// const tours = await Tour.find(searchQuery).find(filter).sort(sort).select(fields).skip(skip).limit(limit);
 
-//     const searchQuery = {
-//         $or: tourSearchableFields.map(field => ({ [field]: { $regex: searchTerm, $options: "i" } }))
-//     }
+// 	const filterQuery = Tour.find(filter);
+// 	const tours = filterQuery.find(searchQuery);
+// 	const allTours = await tours.sort(sort).select(fields).skip(skip).limit(limit);
 
-//     // [remove][remove][remove](SKip)[][][][][][]
+// 	const totalTours = await Tour.countDocuments();
+// 	const totalPage = Math.ceil(totalTours / limit);
 
-//     // [][][][][](limit)[remove][remove][remove][remove]
+// 	const meta = {
+// 		page,
+// 		limit,
+// 		total: totalTours,
+// 		totalPage,
+// 	};
 
-//     // 1 page => [1][1][1][1][1][1][1][1][1][1] skip = 0 limit =10
-//     // 2 page => [1][1][1][1][1][1][1][1][1][1]=>skip=>[2][2][2][2][2][2][2][2][2][2]<=limit skip = 10 limit =10
-//     // 3 page => [1][1][1][1][1][1][1][1][1][1]=>skip=>[2][2][2][2][2][2][2][2][2][2]<=limit skip = 20 limit = 10
-
-//     // skip = (page -1) * 10 = 30
-
-//     // ?page=3&limit=10
-
-//     // const tours = await Tour.find(searchQuery).find(filter).sort(sort).select(fields).skip(skip).limit(limit);
-
-//     const filterQuery = Tour.find(filter)
-
-//     const tours = filterQuery.find(searchQuery)
-
-//     const allTours = await tours.sort(sort).select(fields).skip(skip).limit(limit)
-
-//     // location = Dhaka
-//     // search = Golf
-//     const totalTours = await Tour.countDocuments();
-//     // const totalPage = 21/10 = 2.1 => ciel(2.1) => 3
-//     const totalPage = Math.ceil(totalTours / limit)
-
-//     const meta = {
-//         page: page,
-//         limit: limit,
-//         total: totalTours,
-//         totalPage: totalPage,
-//     }
-//     return {
-//         data: allTours,
-//         meta: meta
-//     }
+// 	return {
+// 		data: allTours,
+// 		meta,
+// 	};
 // };
+
+const getAllToursOld = async (query: Record<string, string>) => {
+	const queryBuilder = new QueryBuilderProvia(Tour.find(), query);
+
+	const tours = await queryBuilder.search(tourSearchableFields).filter().modelQuery;
+
+	// const totalTours = await Tour.countDocuments();
+	// const totalPage = Math.ceil(totalTours / limit);
+
+	// const meta = {
+	// 	page,
+	// 	limit,
+	// 	total: totalTours,
+	// 	totalPage,
+	// };
+
+	return {
+		data: tours,
+		meta: {},
+	};
+};
 
 const getAllTours = async (query: Record<string, string>) => {
 	const queryBuilder = new QueryBuilder(Tour.find(), query);
@@ -173,4 +174,5 @@ export const TourService = {
 	getAllTours,
 	updateTour,
 	deleteTour,
+	getAllToursOld,
 };
