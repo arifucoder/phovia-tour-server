@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { slugify } from "../../utils/slugify";
 import type { IDivision } from "./division.interface";
 
 const divisionSchema = new Schema<IDivision>(
@@ -12,7 +13,13 @@ const divisionSchema = new Schema<IDivision>(
 );
 
 const generateUniqueSlug = async (name: string, excludeId?: unknown) => {
-	const baseSlug = `${name.trim().toLowerCase().split(/\s+/).join("-")}-division`;
+	const cleaned = slugify(name).replace(/-?division$/, "");
+
+	if (!cleaned) {
+		throw new Error("Invalid division name: cannot generate slug");
+	}
+
+	const baseSlug = `${cleaned}-division`;
 	let slug = baseSlug;
 	let counter = 1;
 

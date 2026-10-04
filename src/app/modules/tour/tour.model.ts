@@ -1,4 +1,5 @@
 import { model, Schema, type Types } from "mongoose";
+import { slugify } from "../../utils/slugify";
 import type { ITour, ITourType } from "./tour.interface";
 
 const tourTypeSchema = new Schema<ITourType>(
@@ -47,7 +48,13 @@ const tourSchema = new Schema<ITour>(
 );
 
 const generateUniqueSlug = async (title: string, excludeId?: Types.ObjectId) => {
-	const baseSlug = title.trim().toLowerCase().split(/\s+/).join("-");
+	const cleaned = slugify(title).replace(/-?division$/, "");
+
+	if (!cleaned) {
+		throw new Error("Invalid division name: cannot generate slug");
+	}
+
+	const baseSlug = `${cleaned}`;
 	let slug = baseSlug;
 	let counter = 1;
 
