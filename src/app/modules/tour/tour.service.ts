@@ -74,21 +74,13 @@ const createTour = async (payload: ITour) => {
 const getAllToursOld = async (query: Record<string, string>) => {
 	const queryBuilder = new QueryBuilderProvia(Tour.find(), query);
 
-	const tours = await queryBuilder.search(tourSearchableFields).filter().modelQuery;
+	const tours = await queryBuilder.search(tourSearchableFields).filter().sort().fields().paginate();
 
-	// const totalTours = await Tour.countDocuments();
-	// const totalPage = Math.ceil(totalTours / limit);
-
-	// const meta = {
-	// 	page,
-	// 	limit,
-	// 	total: totalTours,
-	// 	totalPage,
-	// };
+	const [data, meta] = await Promise.all([tours.build(), queryBuilder.getMeta()]);
 
 	return {
-		data: tours,
-		meta: {},
+		data,
+		meta,
 	};
 };
 
