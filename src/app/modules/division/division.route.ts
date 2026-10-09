@@ -4,7 +4,7 @@ import { checkAuth } from "../../middlewares/checkAuth";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { Role } from "../user/user.interface";
 import { DivisionController } from "./division.controller";
-import { updateDivisionSchema } from "./division.validation";
+import { createDivisionSchema, updateDivisionSchema } from "./division.validation";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.post(
 	"/create",
 	checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
 	multerUpload.single("file"),
-	// validateRequest(createDivisionSchema),
+	validateRequest(createDivisionSchema),
 	DivisionController.createDivision,
 );
 router.get("/", DivisionController.getAllDivisions);
