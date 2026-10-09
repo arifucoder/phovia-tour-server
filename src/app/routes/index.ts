@@ -33,10 +33,6 @@ const moduleRoutes = [
 		path: "/payment",
 		route: PaymentRoutes,
 	},
-	// {
-	// 	path: "/payment",
-	// 	route: PaymentRoutes,
-	// },
 ];
 
 moduleRoutes.forEach((route) => {
