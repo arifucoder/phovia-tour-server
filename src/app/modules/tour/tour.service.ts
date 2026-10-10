@@ -1,3 +1,4 @@
+import AppError from "../../errorHelpers/AppError";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { tourSearchableFields } from "./tour.constant";
 import type { ITour, ITourType } from "./tour.interface";
@@ -8,7 +9,7 @@ const createTour = async (payload: ITour) => {
 	if (existingTour) {
 		throw new Error("A tour with this title already exists.");
 	}
-
+	throw new AppError(400, "new app error");
 	// const baseSlug = payload.title.toLowerCase().split(" ").join("-")
 	// let slug = `${baseSlug}`
 
