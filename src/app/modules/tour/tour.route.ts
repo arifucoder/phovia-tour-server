@@ -43,6 +43,7 @@ router.get("/:slug", TourController.getSingleTour);
 router.patch(
 	"/:id",
 	checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+	multerUpload.array("files"),
 	validateRequest(updateTourZodSchema),
 	TourController.updateTour,
 );
