@@ -10,7 +10,7 @@ router.post("/login", AuthController.credentialLogin);
 router.post("/refresh-token", AuthController.getNewAccessToken);
 router.post("/logout", AuthController.logout);
 router.post("/change-password", checkAuth(...Object.values(Role)), AuthController.changePassword);
-
+router.post("/set-password", checkAuth(...Object.values(Role)), AuthControllers.setPassword);
 //  /booking -> /login -> succesful google login -> /booking frontend
 // /login -> succesful google login -> / frontend
 router.get("/google", async (req: Request, res: Response, next: NextFunction) => {
