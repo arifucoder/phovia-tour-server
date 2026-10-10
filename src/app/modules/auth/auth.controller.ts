@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
+import type { JwtPayload } from "jsonwebtoken";
 import passport from "passport";
 import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
@@ -146,10 +147,25 @@ const googleCallbackController = catchAsync(async (req: Request, res: Response, 
 	res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
 });
 
+const setPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+	const decodedToken = req.user as JwtPayload;
+	const { password } = req.body;
+
+	await AuthServices.setPassword(decodedToken.userId, password);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Password Changed Successfully",
+		data: null,
+	});
+});
+
 export const AuthController = {
 	credentialLogin,
 	getNewAccessToken,
 	logout,
 	changePassword,
 	googleCallbackController,
+	setPassword,
 };
