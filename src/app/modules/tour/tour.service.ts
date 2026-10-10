@@ -45,28 +45,41 @@ const getSingleTour = async (slug: string) => {
 };
 
 const updateTour = async (id: string, payload: Partial<ITour>) => {
-	const existingTour = await Tour.findById(id);
 
-	if (!existingTour) {
-		throw new Error("Tour not found.");
-	}
+    const existingTour = await Tour.findById(id);
 
-	// if (payload.title) {
-	//     const baseSlug = payload.title.toLowerCase().split(" ").join("-")
-	//     let slug = `${baseSlug}`
+    if (!existingTour) {
+        throw new Error("Tour not found.");
+    }
 
-	//     let counter = 0;
-	//     while (await Tour.exists({ slug })) {
-	//         slug = `${slug}-${counter++}` // dhaka-division-2
-	//     }
+    // if (payload.title) {
+    //     const baseSlug = payload.title.toLowerCase().split(" ").join("-")
+    //     let slug = `${baseSlug}`
 
-	//     payload.slug = slug
-	// }
+    //     let counter = 0;
+    //     while (await Tour.exists({ slug })) {
+    //         slug = `${slug}-${counter++}` // dhaka-division-2
+    //     }
 
-	const updatedTour = await Tour.findByIdAndUpdate(id, payload, { new: true });
+    //     payload.slug = slug
+    // }
 
-	return updatedTour;
-};
+    if (payload.images && payload.images.length > 0 && existingTour.images && existingTour.images.length > 0) {
+        payload.images = [...payload.images, ...existingTour.images]
+    }
+
+    if (payload.deleteImages && payload.deleteImages.length > 0 && existingTour.images && existingTour.images.length > 0) {
+
+        const restDBImages = existingTour.images.filter(imageUrl => !payload.deleteImages?.includes(imageUrl))
+
+        const updatedPayloadImages = (payload.images || [])
+            .filter(imageUrl => !payload.deleteImages?.includes(imageUrl))
+            .filter(imageUrl => !restDBImages.includes(imageUrl))
+
+        payload.images = [...restDBImages, ...updatedPayloadImages]
+
+
+}
 
 const deleteTour = async (id: string) => {
 	return await Tour.findByIdAndDelete(id);
