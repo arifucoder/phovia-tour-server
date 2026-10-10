@@ -23,13 +23,15 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
 			// ✅✅✅✅
 			// return next(err)
 			// console.log("from err");
-			return next(new AppError(401, err));
+			if (typeof err === "string") {
+				return next(new AppError(httpStatus.UNAUTHORIZED, err));
+			}
+			// done(error) → আসল Error → globalErrorHandler (500)
+			return next(err);
 		}
 
 		if (!user) {
-			// console.log("from !user");
-			// return new AppError(401, info.message)
-			return next(new AppError(401, info.message));
+			return next(new AppError(httpStatus.UNAUTHORIZED, info?.message ?? "Login failed"));
 		}
 
 		const userTokens = await createUserTokens(user);
@@ -161,6 +163,19 @@ const setPassword = catchAsync(async (req: Request, res: Response, next: NextFun
 	});
 });
 
+const forgotPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+	const { email } = req.body;
+
+	await AuthServices.forgotPassword(email);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Email Sent Successfully",
+		data: null,
+	});
+});
+
 export const AuthController = {
 	credentialLogin,
 	getNewAccessToken,
@@ -168,4 +183,5 @@ export const AuthController = {
 	changePassword,
 	googleCallbackController,
 	setPassword,
+	forgotPassword,
 };
