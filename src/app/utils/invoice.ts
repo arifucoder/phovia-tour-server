@@ -9,6 +9,7 @@ export interface IInvoiceData {
 	tourTitle: string;
 	guestCount: number;
 	totalAmount: number;
+	createdAt?: Date;
 }
 
 export const generatePdf = async (invoiceData: IInvoiceData): Promise<Buffer<ArrayBufferLike>> => {
