@@ -1,4 +1,4 @@
-import bcrypt, { default as bcryptjs } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import httpStatus from "http-status-codes";
 import type { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
@@ -63,10 +63,6 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
 		if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
 			throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
 		}
-	}
-
-	if (payload.password) {
-		payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUND);
 	}
 
 	const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true });
