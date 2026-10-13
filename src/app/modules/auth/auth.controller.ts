@@ -6,7 +6,7 @@ import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { setAuthCookie } from "../../utils/setCookie";
+import { authCookieOptions, setAuthCookie } from "../../utils/setCookie";
 import { createUserTokens } from "../../utils/userTokens";
 import { AuthServices } from "./auth.service";
 
@@ -87,22 +87,14 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: N
 	});
 });
 
-const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-	res.clearCookie("accessToken", {
-		httpOnly: true,
-		secure: false,
-		sameSite: "lax",
-	});
-	res.clearCookie("refreshToken", {
-		httpOnly: true,
-		secure: false,
-		sameSite: "lax",
-	});
+const logout = catchAsync(async (req: Request, res: Response) => {
+	res.clearCookie("accessToken", authCookieOptions);
+	res.clearCookie("refreshToken", authCookieOptions);
 
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
-		message: "User Logged Out Successfully",
+		message: "User logged out successfully",
 		data: null,
 	});
 });
