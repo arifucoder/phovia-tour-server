@@ -9,11 +9,12 @@ export default defineConfig({
 	bundle: true,
 	splitting: false,
 	sourcemap: true,
-	// Add this banner to shim require() for CJS dependencies
 	banner: {
 		js: `
       import { createRequire } from 'module';
       const require = createRequire(import.meta.url);
     `,
 	},
+	// build শেষ হলে templates copy করো
+	onSuccess: "cp -r src/app/utils/templates dist/templates",
 });
