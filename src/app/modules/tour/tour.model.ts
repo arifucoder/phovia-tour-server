@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { model, Schema, type Types } from "mongoose";
 import { slugify } from "../../utils/slugify";
 import type { ITour, ITourType } from "./tour.interface";

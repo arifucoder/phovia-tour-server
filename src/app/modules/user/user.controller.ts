@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import type { JwtPayload } from "jsonwebtoken";

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import type { JwtPayload } from "jsonwebtoken";
@@ -38,7 +40,7 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
 
 		// delete user.toObject().password
 
-		const { password: pass, ...rest } = user.toObject();
+		const { ...rest } = user.toObject();
 
 		setAuthCookie(res, userTokens);
 
