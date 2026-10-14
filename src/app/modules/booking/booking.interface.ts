@@ -1,5 +1,3 @@
-// User - Booking(Pending) -> Payment (Unpaid) -> SSLCommerz -> Booking update = confirm -> Payment update = Paid
-
 import { Types } from "mongoose";
 
 export enum BOOKING_STATUS {

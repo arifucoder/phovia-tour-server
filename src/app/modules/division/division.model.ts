@@ -30,7 +30,7 @@ const generateUniqueSlug = async (name: string, excludeId?: unknown) => {
 			...(excludeId ? { _id: { $ne: excludeId } } : {}),
 		})
 	) {
-		slug = `${baseSlug}-${counter++}`; // dhaka-division-1, dhaka-division-2
+		slug = `${baseSlug}-${counter++}`;
 	}
 
 	return slug;

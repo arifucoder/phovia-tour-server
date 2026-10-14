@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-// import catchAsync from "../utils/catchAsync";
 import { type JwtPayload } from "jsonwebtoken";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
@@ -43,7 +42,6 @@ const getAllBookings = catchAsync(async (req: Request, res: Response) => {
 		success: true,
 		message: "Bookings retrieved successfully",
 		data: {},
-		// meta: {},
 	});
 });
 
