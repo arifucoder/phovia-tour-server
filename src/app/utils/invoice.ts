@@ -22,7 +22,6 @@ export const generatePdf = async (invoiceData: IInvoiceData): Promise<Buffer<Arr
 			doc.on("end", () => resolve(Buffer.concat(buffer)));
 			doc.on("error", (err) => reject(err));
 
-			//PDF Content
 			doc.fontSize(20).text("Invoice", { align: "center" });
 			doc.moveDown();
 			doc.fontSize(14).text(`Transaction ID : ${invoiceData.transactionId}`);
