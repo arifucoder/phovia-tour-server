@@ -25,14 +25,12 @@ const changePassword = async (oldPassword: string, newPassword: string, decodedT
 		throw new AppError(httpStatus.NOT_FOUND, "User not found");
 	}
 
-	// ১. পুরোনো password মিলছে কিনা
 	const isOldPasswordMatch = await bcryptjs.compare(oldPassword, user.password as string);
 
 	if (!isOldPasswordMatch) {
 		throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match");
 	}
 
-	// ২. নতুন password hash করে save করা
 	user.password = await bcryptjs.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND));
 
 	await user.save();
@@ -103,10 +101,6 @@ const forgotPassword = async (email: string) => {
 			resetUILink,
 		},
 	});
-
-	/**
-	 * http://localhost:5173/reset-password?id=687f310c724151eb2fcf0c41&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODdmMzEwYzcyNDE1MWViMmZjZjBjNDEiLCJlbWFpbCI6InNhbWluaXNyYXI2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUzMTY2MTM3LCJleHAiOjE3NTMxNjY3Mzd9.LQgXBmyBpEPpAQyPjDNPL4m2xLF4XomfUPfoxeG0MKg
-	 */
 };
 
 const resetPassword = async (payload: Record<string, any>, decodedToken: JwtPayload) => {
@@ -127,7 +121,6 @@ const resetPassword = async (payload: Record<string, any>, decodedToken: JwtPayl
 };
 
 export const AuthServices = {
-	// credentialLogin,
 	getNewAccessToken,
 	changePassword,
 	setPassword,
