@@ -189,8 +189,6 @@ const getBookingStats = async () => {
 	]);
 
 	const bookingsPerTourPromise = Booking.aggregate([
-		//stage1 group stage
-
 		{
 			$group: {
 				_id: "$tour",
@@ -198,17 +196,14 @@ const getBookingStats = async () => {
 			},
 		},
 
-		//stage-2 sort stage
 		{
 			$sort: { bookingCount: -1 },
 		},
 
-		//stage-3 limit stage
 		{
 			$limit: 10,
 		},
 
-		//stage-4 lookup stage
 		{
 			$lookup: {
 				from: "tours",
@@ -218,12 +213,9 @@ const getBookingStats = async () => {
 			},
 		},
 
-		// stage5 - unwind stage
 		{
 			$unwind: "$tour",
 		},
-
-		// stage6 project stage
 
 		{
 			$project: {
@@ -236,7 +228,6 @@ const getBookingStats = async () => {
 	]);
 
 	const avgGuestCountPerBookingPromise = Booking.aggregate([
-		// stage 1  - group stage
 		{
 			$group: {
 				_id: null,
@@ -288,7 +279,6 @@ const getPaymentStats = async () => {
 	const totalPaymentPromise = Payment.countDocuments();
 
 	const totalPaymentByStatusPromise = Payment.aggregate([
-		//stage 1 group
 		{
 			$group: {
 				_id: "$status",
@@ -298,7 +288,6 @@ const getPaymentStats = async () => {
 	]);
 
 	const totalRevenuePromise = Payment.aggregate([
-		//stage1 match stage
 		{
 			$match: { status: PAYMENT_STATUS.PAID },
 		},
@@ -311,7 +300,6 @@ const getPaymentStats = async () => {
 	]);
 
 	const avgPaymentAmountPromise = Payment.aggregate([
-		//stage 1 group stage
 		{
 			$group: {
 				_id: null,
@@ -321,7 +309,6 @@ const getPaymentStats = async () => {
 	]);
 
 	const paymentGatewayDataPromise = Payment.aggregate([
-		//stage 1 group stage
 		{
 			$group: {
 				_id: { $ifNull: ["$paymentGatewayData.status", "UNKNOWN"] },
@@ -339,26 +326,6 @@ const getPaymentStats = async () => {
 	]);
 	return { totalPayment, totalPaymentByStatus, totalRevenue, avgPaymentAmount, paymentGatewayData };
 };
-
-/**
- * await Tour.updateMany(
-        {
-            // Only update where tourType or division is stored as a string
-            $or: [
-                { tourType: { $type: "string" } },
-                { division: { $type: "string" } }
-            ]
-        },
-        [
-            {
-                $set: {
-                    tourType: { $toObjectId: "$tourType" },
-                    division: { $toObjectId: "$division" }
-                }
-            }
-        ]
-    );
- */
 
 export const StatsService = {
 	getBookingStats,
