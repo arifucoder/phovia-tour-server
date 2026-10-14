@@ -9,16 +9,6 @@ const createTour = async (payload: ITour) => {
 	if (existingTour) {
 		throw new Error("A tour with this title already exists.");
 	}
-	// throw new AppError(400, "new app error");
-	// const baseSlug = payload.title.toLowerCase().split(" ").join("-")
-	// let slug = `${baseSlug}`
-
-	// let counter = 0;
-	// while (await Tour.exists({ slug })) {
-	//     slug = `${slug}-${counter++}` // dhaka-division-2
-	// }
-
-	// payload.slug = slug;
 
 	const tour = await Tour.create(payload);
 
@@ -29,8 +19,6 @@ const getAllTours = async (query: Record<string, string>) => {
 	const queryBuilder = new QueryBuilder(Tour.find(), query);
 
 	const tours = queryBuilder.search(tourSearchableFields).filter().sort().fields().paginate();
-
-	// const meta = await queryBuilder.getMeta()
 
 	const [data, meta] = await Promise.all([tours.build(), queryBuilder.getMeta()]);
 
@@ -51,18 +39,6 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
 	if (!existingTour) {
 		throw new Error("Tour not found.");
 	}
-
-	// if (payload.title) {
-	//     const baseSlug = payload.title.toLowerCase().split(" ").join("-")
-	//     let slug = `${baseSlug}`
-
-	//     let counter = 0;
-	//     while (await Tour.exists({ slug })) {
-	//         slug = `${slug}-${counter++}` // dhaka-division-2
-	//     }
-
-	//     payload.slug = slug
-	// }
 
 	if (payload.images && payload.images.length > 0 && existingTour.images && existingTour.images.length > 0) {
 		payload.images = [...payload.images, ...existingTour.images];

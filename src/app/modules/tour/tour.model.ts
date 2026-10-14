@@ -65,7 +65,7 @@ const generateUniqueSlug = async (title: string, excludeId?: Types.ObjectId) => 
 			...(excludeId ? { _id: { $ne: excludeId } } : {}),
 		})
 	) {
-		slug = `${baseSlug}-${counter++}`; // cox-bazar-tour-1, cox-bazar-tour-2
+		slug = `${baseSlug}-${counter++}`;
 	}
 
 	return slug;

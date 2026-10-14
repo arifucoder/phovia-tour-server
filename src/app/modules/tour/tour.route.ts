@@ -8,7 +8,6 @@ import { createTourTypeZodSchema, createTourZodSchema, updateTourZodSchema } fro
 
 const router = express.Router();
 
-/* ------------------ TOUR TYPE ROUTES -------------------- */
 router.get("/tour-types", TourController.getAllTourTypes);
 
 router.post(
@@ -26,8 +25,6 @@ router.patch(
 );
 
 router.delete("/tour-types/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTourType);
-
-/* --------------------- TOUR ROUTES ---------------------- */
 
 router.get("/", TourController.getAllTours);
 
