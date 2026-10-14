@@ -43,9 +43,6 @@ const initPayment = async (bookingId: string) => {
 	};
 };
 const successPayment = async (query: Record<string, string>) => {
-	// Update Booking Status to COnfirm
-	// Update Payment Status to PAID
-
 	const session = await Booking.startSession();
 	session.startTransaction();
 
@@ -111,20 +108,17 @@ const successPayment = async (query: Record<string, string>) => {
 			],
 		});
 
-		await session.commitTransaction(); //transaction
+		await session.commitTransaction();
 		session.endSession();
 		return { success: true, message: "Payment Completed Successfully" };
 	} catch (error) {
-		await session.abortTransaction(); // rollback
+		await session.abortTransaction();
 		session.endSession();
-		// throw new AppError(httpStatus.BAD_REQUEST, error) ❌❌
+
 		throw error;
 	}
 };
 const failPayment = async (query: Record<string, string>) => {
-	// Update Booking Status to FAIL
-	// Update Payment Status to FAIL
-
 	const session = await Booking.startSession();
 	session.startTransaction();
 
@@ -143,20 +137,16 @@ const failPayment = async (query: Record<string, string>) => {
 			{ runValidators: true, session },
 		);
 
-		await session.commitTransaction(); //transaction
+		await session.commitTransaction();
 		session.endSession();
 		return { success: false, message: "Payment Failed" };
 	} catch (error) {
-		await session.abortTransaction(); // rollback
+		await session.abortTransaction();
 		session.endSession();
-		// throw new AppError(httpStatus.BAD_REQUEST, error) ❌❌
 		throw error;
 	}
 };
 const cancelPayment = async (query: Record<string, string>) => {
-	// Update Booking Status to CANCEL
-	// Update Payment Status to CANCEL
-
 	const session = await Booking.startSession();
 	session.startTransaction();
 
@@ -175,13 +165,12 @@ const cancelPayment = async (query: Record<string, string>) => {
 			{ runValidators: true, session },
 		);
 
-		await session.commitTransaction(); //transaction
+		await session.commitTransaction();
 		session.endSession();
 		return { success: false, message: "Payment Cancelled" };
 	} catch (error) {
-		await session.abortTransaction(); // rollback
+		await session.abortTransaction();
 		session.endSession();
-		// throw new AppError(httpStatus.BAD_REQUEST, error) ❌❌
 		throw error;
 	}
 };

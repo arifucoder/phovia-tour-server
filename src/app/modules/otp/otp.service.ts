@@ -6,11 +6,7 @@ import { User } from "../user/user.model";
 const OTP_EXPIRATION = 2 * 60; // 2minute
 
 const generateOtp = (length = 6) => {
-	//6 digit otp
 	const otp = crypto.randomInt(10 ** (length - 1), 10 ** length).toString();
-
-	// 10 ** 5 => 10 * 10 *10 *10 *10 * 10 => 1000000
-
 	return otp;
 };
 
@@ -47,7 +43,6 @@ const sendOTP = async (email: string, name: string) => {
 };
 
 const verifyOTP = async (email: string, otp: string) => {
-	// const user = await User.findOne({ email, isVerified: false })
 	const user = await User.findOne({ email });
 
 	if (!user) {
