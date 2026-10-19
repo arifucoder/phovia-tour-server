@@ -12,7 +12,7 @@ const isProduction = envVars.NODE_ENV === "production";
 // set আর clear — দুই জায়গায় একই option লাগবে, তাই export
 export const authCookieOptions: CookieOptions = {
 	httpOnly: true,
-	secure: isProduction, // local (HTTP) → false, production (HTTPS) → true
+	secure: true, // local (HTTP) → false, production (HTTPS) → true
 	sameSite: isProduction ? "none" : "lax", // আলাদা domain-এ cookie পাঠাতে "none"
 };
 
