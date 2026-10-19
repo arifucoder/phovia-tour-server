@@ -4,95 +4,82 @@ import AppError from "../../errorHelpers/AppError";
 import { getTransactionId } from "../../utils/getTransactionId";
 import { PAYMENT_STATUS } from "../payment/payment.interface";
 import { Payment } from "../payment/payment.model";
-import type { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
 import { Tour } from "../tour/tour.model";
 import { User } from "../user/user.model";
-import { BOOKING_STATUS, type IBooking } from "./booking.interface";
+import { BOOKING_STATUS } from "./booking.interface";
 import { Booking } from "./booking.model";
+import type { TCreateBookingPayload } from "./booking.validation";
 
-const createBooking = async (payload: Partial<IBooking>, userId: string) => {
+const createBooking = async (payload: TCreateBookingPayload, userId: string) => {
+	// ── Transaction-এর আগে: শুধু পড়া আর check ──
+	const user = await User.findById(userId);
+
+	// Booking-এর পর user-এর সাথে যোগাযোগ করতে হবে, তাই phone আর address বাধ্যতামূলক
+	if (!user?.phone || !user.address) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Please update your profile (phone and address) to book a tour.");
+	}
+
+	// শুধু costFrom দরকার, তাই select করে শুধু ওটাই আনি
+	const tour = await Tour.findById(payload.tour).select("costFrom");
+
+	if (!tour) {
+		throw new AppError(httpStatus.NOT_FOUND, "Tour not found.");
+	}
+	if (!tour.costFrom) {
+		throw new AppError(httpStatus.BAD_REQUEST, "This tour has no price set yet.");
+	}
+
+	const amount = tour.costFrom * payload.guestCount;
 	const transactionId = getTransactionId();
 
+	// ── Transaction: ৩টা write একসাথে ──
 	const session = await Booking.startSession();
 	session.startTransaction();
 
 	try {
-		const user = await User.findById(userId);
+		// ① Booking তৈরি
+		const booking = await new Booking({
+			user: userId,
+			tour: payload.tour,
+			guestCount: payload.guestCount,
+			status: BOOKING_STATUS.PENDING,
+		}).save({ session });
 
-		if (!user?.phone || !user.address) {
-			throw new AppError(httpStatus.BAD_REQUEST, "Please Update Your Profile to Book a Tour.");
-		}
+		// ② Payment (bill) তৈরি
+		const payment = await new Payment({
+			booking: booking._id,
+			transactionId,
+			amount,
+			status: PAYMENT_STATUS.UNPAID,
+		}).save({ session });
 
-		const tour = await Tour.findById(payload.tour).select("costFrom");
-
-		if (!tour?.costFrom) {
-			throw new AppError(httpStatus.BAD_REQUEST, "No Tour Cost Found!");
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const amount = Number(tour.costFrom) * Number(payload.guestCount!);
-
-		const booking = await Booking.create(
-			[
-				{
-					user: userId,
-					status: BOOKING_STATUS.PENDING,
-					...payload,
-				},
-			],
-			{ session },
-		);
-
-		const payment = await Payment.create(
-			[
-				{
-					booking: booking[0]._id,
-					status: PAYMENT_STATUS.UNPAID,
-					transactionId: transactionId,
-					amount: amount,
-				},
-			],
-			{ session },
-		);
-
+		// ③ Booking-এ payment id বসানো + response-এর জন্য populate
 		const updatedBooking = await Booking.findByIdAndUpdate(
-			booking[0]._id,
-			{ payment: payment[0]._id },
+			booking._id,
+			{ payment: payment._id },
 			{ new: true, runValidators: true, session },
 		)
-			.populate("user", "name email phone address")
 			.populate("tour", "title costFrom")
 			.populate("payment");
 
-		const userAddress = (updatedBooking?.user as any).address;
-		const userEmail = (updatedBooking?.user as any).email;
-		const userPhoneNumber = (updatedBooking?.user as any).phone;
-		const userName = (updatedBooking?.user as any).name;
+		// ④ SSLCommerz-এ payment শুরু
+		const paymentUrl = await SSLService.sslPaymentInit({
+			name: user.name,
+			email: user.email,
+			phoneNumber: user.phone,
+			address: user.address,
+			amount,
+			transactionId,
+		});
 
-		const sslPayload: ISSLCommerz = {
-			address: userAddress,
-			email: userEmail,
-			phoneNumber: userPhoneNumber,
-			name: userName,
-			amount: amount,
-			transactionId: transactionId,
-		};
-
-		const sslPayment = await SSLService.sslPaymentInit(sslPayload);
-
-		console.log(sslPayment);
-
-		await session.commitTransaction();
-		session.endSession();
-		return {
-			paymentUrl: sslPayment.GatewayPageURL,
-			booking: updatedBooking,
-		};
+		await session.commitTransaction(); // সব ঠিক → আসল DB-তে
+		return { paymentUrl, booking: updatedBooking };
 	} catch (error) {
-		await session.abortTransaction();
-		session.endSession();
+		await session.abortTransaction(); // কোথাও error → সব বাতিল
 		throw error;
+	} finally {
+		await session.endSession();
 	}
 };
 
