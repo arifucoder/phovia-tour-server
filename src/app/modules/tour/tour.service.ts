@@ -1,4 +1,5 @@
 import { deleteImageFromCLoudinary } from "../../config/cloudinary.config";
+import AppError from "../../errorHelpers/AppError";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { tourSearchableFields } from "./tour.constant";
 import type { ITour, ITourType } from "./tour.interface";
@@ -16,16 +17,16 @@ const createTour = async (payload: ITour) => {
 };
 
 const getAllTours = async (query: Record<string, string>) => {
-	const queryBuilder = new QueryBuilder(Tour.find(), query);
+	const queryBuilder = new QueryBuilder(
+		Tour.find().populate("division", "name slug").populate("tourType", "name"),
+		query,
+	);
 
 	const tours = queryBuilder.search(tourSearchableFields).filter().sort().fields().paginate();
 
 	const [data, meta] = await Promise.all([tours.build(), queryBuilder.getMeta()]);
 
-	return {
-		data,
-		meta,
-	};
+	return { data, meta };
 };
 
 const getSingleTour = async (slug: string) => {
@@ -74,7 +75,16 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
 };
 
 const deleteTour = async (id: string) => {
-	return await Tour.findByIdAndDelete(id);
+	const tour = await Tour.findByIdAndDelete(id);
+	if (!tour) {
+		throw new AppError(404, "Tour not found.");
+	}
+
+	if (tour.images?.length) {
+		await Promise.all(tour.images.map((url) => deleteImageFromCLoudinary(url)));
+	}
+
+	return null;
 };
 
 const createTourType = async (payload: ITourType) => {
