@@ -52,19 +52,18 @@ export const uploadBufferToCloudinary = async (
 
 export const deleteImageFromCLoudinary = async (url: string) => {
 	try {
-		//https://res.cloudinary.com/djzppynpk/image/upload/v1753126572/ay9roxiv8ue-1753126570086-download-2-jpg.jpg.jpg
-
-		const regex = /\/v\d+\/(.*?)\.(jpg|jpeg|png|gif|webp)$/i;
-
+		// https://res.cloudinary.com/<cloud>/image/upload/v1753126572/<public_id>.jpg
+		const regex = /\/upload\/(?:v\d+\/)?(.+?)\.[a-z0-9]+$/i;
 		const match = url.match(regex);
 
-		console.log({ match });
-
-		if (match && match[1]) {
-			const public_id = match[1];
-			await cloudinary.uploader.destroy(public_id);
-			console.log(`File ${public_id} is deleted from cloudinary`);
+		if (!match?.[1]) {
+			console.warn("Could not extract public_id from:", url);
+			return;
 		}
+
+		const public_id = match[1];
+		const result = await cloudinary.uploader.destroy(public_id);
+		console.log(`Cloudinary destroy ${public_id}:`, result); // { result: "ok" } or { result: "not found" }
 	} catch (error: any) {
 		throw new AppError(401, "Cloudinary image deletion failed", error.message);
 	}

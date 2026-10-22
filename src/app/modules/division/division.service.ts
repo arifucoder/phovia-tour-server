@@ -54,7 +54,17 @@ const updateDivision = async (id: string, payload: Partial<IDivision>) => {
 };
 
 const deleteDivision = async (id: string) => {
+	const division = await Division.findById(id);
+	if (!division) {
+		throw new Error("Division not found.");
+	}
+
 	await Division.findByIdAndDelete(id);
+
+	if (division.thumbnail) {
+		await deleteImageFromCLoudinary(division.thumbnail);
+	}
+
 	return null;
 };
 
