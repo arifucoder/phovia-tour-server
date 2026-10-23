@@ -4,6 +4,7 @@ import { QueryBuilder } from "../../utils/QueryBuilder";
 import { tourSearchableFields } from "./tour.constant";
 import type { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
+import httpStatus from "http-status-codes"
 
 const createTour = async (payload: ITour) => {
 	const existingTour = await Tour.findOne({ title: payload.title });
@@ -30,7 +31,10 @@ const getAllTours = async (query: Record<string, string>) => {
 };
 
 const getSingleTour = async (slug: string) => {
-	const tour = await Tour.findOne({ slug });
+	const tour = await Tour.findOne({ slug }).populate("division", "name slug").populate("tourType", "name");
+	if (!tour) {
+		throw new AppError(httpStatus.NOT_FOUND, "Tour not found.");
+	}
 	return tour;
 };
 
