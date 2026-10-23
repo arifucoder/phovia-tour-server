@@ -48,7 +48,12 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
 			headers: { "Content-Type": "application/x-www-form-urlencoded" }, // eita kno laglo?
 		});
 
-		return response.data;
+		// SSLCommerz returns { status: "SUCCESS" | "FAILED", GatewayPageURL, failedreason, ... }
+		if (response.data?.status !== "SUCCESS" || !response.data?.GatewayPageURL) {
+			throw new Error(response.data?.failedreason || "Could not start payment.");
+		}
+
+		return response.data.GatewayPageURL as string;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
 		console.log("Payment Error Occurred", error);

@@ -16,5 +16,5 @@ export default defineConfig({
     `,
 	},
 	// build শেষ হলে templates copy করো
-	onSuccess: "cp -r src/app/utils/templates dist/templates",
+	onSuccess: "mkdir -p dist/templates && cp -r src/app/utils/templates/. dist/templates/",
 });
